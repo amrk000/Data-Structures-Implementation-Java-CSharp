@@ -61,7 +61,7 @@ class HashTable<T>
     }
 
     //check if current load factor isn't bigger than optimal to determine if rehashing is needed
-    public bool isLoadFactorOptimal()
+    public bool IsLoadFactorOptimal()
     {
         return LoadFactor() <= optimalLoadFactor;
     }
@@ -127,7 +127,7 @@ class HashTable<T>
 
         size++;
 
-        if (!isLoadFactorOptimal()) Rehash(); //check if rehashing is required
+        if (!IsLoadFactorOptimal()) Rehash(); //check if rehashing is required
     }
 
     //get element by key

@@ -138,8 +138,8 @@ class DoubleLinkedList<T> : IEnumerable<T>
     {
         if (IsEmpty()) return;
 
-        if (Comparer.Equals(head.data, element)) RemoveFirst(); //if data found at head delete first
-        else if (Comparer.Equals(tail.data, element)) RemoveLast(); //if data found at tail delete last
+        if (Comparer.ReferenceEquals(head.data, element)) RemoveFirst(); //if data found at head delete first
+        else if (Comparer.ReferenceEquals(tail.data, element)) RemoveLast(); //if data found at tail delete last
         else if (head.next != null)
         {
             //make a node that starts at head and traverse on all nodes one by one to reach target
@@ -148,7 +148,7 @@ class DoubleLinkedList<T> : IEnumerable<T>
             while (traverse.next != null)
             {
                 //Target found
-                if (Comparer.Equals(traverse.data, element))
+                if (Comparer.ReferenceEquals(traverse.data, element))
                 {
                     //link next & prev nodes together, So nodes around target are linked and target is out
                     traverse.next.previous = traverse.previous;

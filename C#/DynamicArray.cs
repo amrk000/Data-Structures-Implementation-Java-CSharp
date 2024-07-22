@@ -83,7 +83,7 @@ class DynamicArray<T> : IEnumerable<T>
         //find object and get index
         for (int i = 0; i < size; i++)
         {
-            if (Comparer.Equals(array[i], element))
+            if (Comparer.ReferenceEquals(array[i], element))
             {
                 //shift array elements back
                 ShiftBack(i);
