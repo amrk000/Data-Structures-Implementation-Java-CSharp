@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-//Binary Tree implementation | From Repo: https://github.com/amrk000/Data-Structures-Implementation-Java-CSharp
+//Binary Tree based on key value implementation | From Repo: https://github.com/amrk000/Data-Structures-Implementation-Java-CSharp
 //by Amrk000 - No license or attribution required
 
 //generic BinaryTree of type <T>
@@ -13,27 +13,27 @@ class BinaryTree<T>
 {
     private Node<T> root;
     private int size;
-    private Comparer<T> comparer;
 
-    public BinaryTree(Comparer<T> comparer)
+    public BinaryTree()
     {
         root = null;
         size = 0;
-        this.comparer = comparer;
     }
 
-    //Node element that carry comparison data and references to next children in tree chain
+    //Node element that carry comparison key, data and references to next children in tree chain
     internal class Node<T>
     {
         internal T data;
         internal Node<T> leftChild;
         internal Node<T> rightChild;
+        internal int key;
 
         public Node(int key, T data)
         {
             this.data = data;
             this.leftChild = null;
             this.rightChild = null;
+            this.key = key;
         }
     }
 
@@ -68,18 +68,18 @@ class BinaryTree<T>
         //if child is null last call in stack returns the newNode to be added to tree
         if (currentNode == null) return newNode; //addition condition
 
-        if (comparer.Compare(newNode.data, currentNode.data) < 0)
+        if (newNode.key < currentNode.key)
         {
             currentNode.leftChild = RecursiveAddition(currentNode.leftChild, newNode); //move to left child
         }
-        else if (comparer.Compare(newNode.data, currentNode.data) > 0)
+        else if (newNode.key > currentNode.key)
         {
             currentNode.rightChild = RecursiveAddition(currentNode.rightChild, newNode); //move to right child
         }
         else
         {
             //if key of new element equals key in of node in tree throw exception and it won't be added
-            throw new IndexOutOfRangeException("There is already an item with Value: " + currentNode.data);
+            throw new IndexOutOfRangeException("There is already an item with key: " + currentNode.key + ", has Value: " + currentNode.data);
         }
 
         return currentNode;
@@ -93,24 +93,24 @@ class BinaryTree<T>
     }
 
     //get the deepest node in left side in subtree to replace the node that will be removed while deleting data
-    private Node<T> GetDeepestLeftNode(Node<T> node)
+    private Node<T> getDeepestLeftNode(Node<T> node)
     {
-        return node.leftChild == null ? node : GetDeepestLeftNode(node.leftChild);
+        return node.leftChild == null ? node : getDeepestLeftNode(node.leftChild);
     }
 
     //remove element from tree recursively
-    private Node<T> RecursiveRemoval(Node<T> currentNode, T target)
+    private Node<T> recursiveRemoval(Node<T> currentNode, int key)
     {
 
         if (currentNode == null) return null; //reached null child of leaf stop
 
-        if (comparer.Compare(target, currentNode.data) < 0)
+        if (key < currentNode.key)
         {
-            currentNode.leftChild = RecursiveRemoval(currentNode.leftChild, target); //move to left child
+            currentNode.leftChild = recursiveRemoval(currentNode.leftChild, key); //move to left child
         }
-        else if (comparer.Compare(target, currentNode.data) > 0)
+        else if (key > currentNode.key)
         {
-            currentNode.rightChild = RecursiveRemoval(currentNode.rightChild, target); //move to right child
+            currentNode.rightChild = recursiveRemoval(currentNode.rightChild, key); //move to right child
         }
         else
         {
@@ -129,11 +129,12 @@ class BinaryTree<T>
             }
 
             //Case 4 (node has 2 children): replace the node value with the value of smallest child in right subtree
-            Node<T> smallestNode = GetDeepestLeftNode(currentNode.rightChild);
+            Node<T> smallestNode = getDeepestLeftNode(currentNode.rightChild);
             currentNode.data = smallestNode.data;
+            currentNode.key = smallestNode.key;
 
             //remove the smallest child node in right subtree
-            currentNode.rightChild = RecursiveRemoval(currentNode.rightChild, smallestNode.data);
+            currentNode.rightChild = recursiveRemoval(currentNode.rightChild, smallestNode.key);
 
             //Note: Case 4 another approach is to replace node value with the value of biggest child in left subtree
         }
@@ -141,23 +142,23 @@ class BinaryTree<T>
         return currentNode;
     }
 
-    //delete node
-    public void Remove(T element)
+    //delete node by its key
+    public void remove(int key)
     {
-        root = RecursiveRemoval(root, element);
+        root = recursiveRemoval(root, key);
         size--;
     }
 
     //Depth First Search (DFS) Traversals: inorder, preorder, postorder
 
     //traverse the tree inorder (Sorted order) recursively and return list of elements
-    private void TraverseInOrder(Node<T> node, ArrayList output)
+    private void traverseInOrder(Node<T> node, ArrayList output)
     {
         if (node != null)
         {
-            TraverseInOrder(node.leftChild, output);
+            traverseInOrder(node.leftChild, output);
             output.Add(node.data);
-            TraverseInOrder(node.rightChild, output);
+            traverseInOrder(node.rightChild, output);
         }
     }
 
@@ -165,7 +166,7 @@ class BinaryTree<T>
     public ArrayList GetInorderList()
     {
         ArrayList output = new ArrayList();
-        TraverseInOrder(root, output);
+        traverseInOrder(root, output);
         return output;
     }
 
@@ -237,33 +238,33 @@ class BinaryTree<T>
     }
 
     //Depth First Search (DFS)
-    private Node<T> Search(Node<T> node, T target)
+    private Node<T> Search(Node<T> node, int targetKey)
     {
         if (node == null) return null; //reached null child of leaf stop
 
-        if (comparer.Compare(target, node.data) < 0) return Search(node.leftChild, target); //if target key is less than current move left
-        else if (comparer.Compare(target, node.data) > 0) return Search(node.rightChild, target); //else if target key is bigger than current move right
+        if (targetKey < node.key) return Search(node.leftChild, targetKey); //if target key is less than current move left
+        else if (targetKey > node.key) return Search(node.rightChild, targetKey); //else if target key is bigger than current move right
 
         //else return current node which has key that equals target key
         return node;
     }
 
-    //get data by element
-    public T Find(T element)
+    //get data by key
+    public T Get(int key)
     {
-        Node<T> node = Search(root, element);
+        Node<T> node = Search(root, key);
         if (node == null) return default;
         return node.data;
     }
 
-    //check if tree contain element
-    public bool Contains(T element)
+    //check if tree contain element with key
+    public bool contains(int key)
     {
-        return Find(element) != null;
+        return Get(key) != null;
     }
     
     //clear all elements
-    public void Clear()
+    public void clear()
     {
         size = 0;
         root = null;

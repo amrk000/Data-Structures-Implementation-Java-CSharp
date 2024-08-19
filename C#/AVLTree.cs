@@ -13,20 +13,21 @@ class AVLTree<T>
 {
     private Node<T> root;
     private int size;
+    private Comparer<T> comparer;
 
-    public AVLTree()
+    public AVLTree(Comparer<T> comparer)
     {
         root = null;
         size = 0;
+        this.comparer = comparer;
     }
 
-    //Node element that carry comparison key, height, data and references to next children in tree chain
+    //Node element that carry comparison height, data and references to next children in tree chain
     internal class Node<T>
     {
         internal T data;
         internal Node<T> leftChild;
         internal Node<T> rightChild;
-        internal int key;
         internal int height; //avl tree uses height in each node
 
         public Node(int key, T data)
@@ -34,7 +35,6 @@ class AVLTree<T>
             this.data = data;
             this.leftChild = null;
             this.rightChild = null;
-            this.key = key;
         }
     }
 
@@ -150,18 +150,18 @@ class AVLTree<T>
         //if child is null last call in stack returns the newNode to be added to tree
         if (currentNode == null) return newNode;
 
-        if (newNode.key < currentNode.key)
+        if (comparer.Compare(newNode.data, currentNode.data) < 0)
         {
             currentNode.leftChild = RecursiveAddition(currentNode.leftChild, newNode); //move to left child
         }
-        else if (newNode.key > currentNode.key)
+        else if (comparer.Compare(newNode.data, currentNode.data) > 0)
         {
             currentNode.rightChild = RecursiveAddition(currentNode.rightChild, newNode); //move to right child
         }
         else
         {
             //if key of new element equals key in of node in tree throw exception and it won't be added
-            throw new IndexOutOfRangeException("There is already an item with key: " + currentNode.key + ", has Value: " + currentNode.data);
+            throw new IndexOutOfRangeException("There is already an item with Value: " + currentNode.data);
         }
 
         UpdateNodeHeight(currentNode); //update each node height
@@ -182,18 +182,18 @@ class AVLTree<T>
     }
 
     //remove element from tree recursively
-    private Node<T> RecursiveRemoval(Node<T> currentNode, int key)
+    private Node<T> RecursiveRemoval(Node<T> currentNode, T target)
     {
 
         if (currentNode == null) return null; //reached null child of leaf stop
 
-        if (key < currentNode.key)
+        if (comparer.Compare(target, currentNode.data) < 0)
         {
-            currentNode.leftChild = RecursiveRemoval(currentNode.leftChild, key); //move to left child
+            currentNode.leftChild = RecursiveRemoval(currentNode.leftChild, target); //move to left child
         }
-        else if (key > currentNode.key)
+        else if (comparer.Compare(target, currentNode.data) > 0)
         {
-            currentNode.rightChild = RecursiveRemoval(currentNode.rightChild, key); //move to right child
+            currentNode.rightChild = RecursiveRemoval(currentNode.rightChild, target); //move to right child
         }
         else
         {
@@ -215,10 +215,9 @@ class AVLTree<T>
             //Case 4 (node has 2 children): replace the node value with the value of smallest child in right subtree
             Node<T> smallestNode = GetDeepestLeftNode(currentNode.rightChild);
             currentNode.data = smallestNode.data;
-            currentNode.key = smallestNode.key;
 
             //remove the smallest child node in right subtree
-            currentNode.rightChild = RecursiveRemoval(currentNode.rightChild, smallestNode.key);
+            currentNode.rightChild = RecursiveRemoval(currentNode.rightChild, smallestNode.data);
 
             //Note: Case 4 another approach is to replace node value with the value of biggest child in left subtree
         }
@@ -227,10 +226,10 @@ class AVLTree<T>
         return Rebalance(currentNode); //rebalance node before returning
     }
 
-    //delete node by its key
-    public void Remove(int key)
+    //delete node
+    public void remove(T element)
     {
-        root = RecursiveRemoval(root, key);
+        root = RecursiveRemoval(root, element);
         size--;
     }
 
@@ -323,29 +322,29 @@ class AVLTree<T>
     }
 
     //Depth First Search (DFS)
-    private Node<T> Search(Node<T> node, int targetKey)
+    private Node<T> Search(Node<T> node, T target)
     {
         if (node == null) return null; //reached null child of leaf stop
 
-        if (targetKey < node.key) return Search(node.leftChild, targetKey); //if target key is less than current move left
-        else if (targetKey > node.key) return Search(node.rightChild, targetKey); //else if target key is bigger than current move right
+        if (comparer.Compare(target, node.data) < 0) return Search(node.leftChild, target); //if target key is less than current move left
+        else if (comparer.Compare(target, node.data) > 0) return Search(node.rightChild, target); //else if target key is bigger than current move right
 
         //else return current node which has key that equals target key
         return node;
     }
 
-    //get data by key
-    public T get(int key)
+    //get data by element
+    public T Find(T element)
     {
-        Node<T> node = Search(root, key);
+        Node<T> node = Search(root, element);
         if (node == null) return default;
         return node.data;
     }
 
-    //check if tree contain element with key
-    public bool contains(int key)
+    //check if tree contain element
+    public bool Contains(T element)
     {
-        return get(key) != null;
+        return Find(element) != null;
     }
 
     //clear all elements

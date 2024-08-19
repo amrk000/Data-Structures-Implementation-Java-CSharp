@@ -1,34 +1,33 @@
 package org.example.DS;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 
-//AVL Tree (Balanced Tree) implementation | From Repo: https://github.com/amrk000/Data-Structures-Implementation-Java-CSharp
+//AVL Tree (Balanced Tree) based on key value implementation | From Repo: https://github.com/amrk000/Data-Structures-Implementation-Java-CSharp
 //by Amrk000 - No license or attribution required
 
 //generic AVLTree of type <T>
-public class AVLTree<T> {
+public class AVLTree2<T> {
     private Node<T> root;
     private int size;
-    private Comparator<T> comparator; //comparator that used to compare generic data
 
-    public AVLTree(Comparator<T> comparator) {
+    public AVLTree2() {
         root = null;
         size = 0;
-        this.comparator = comparator;
     }
 
-    //Node element that carry height, data and references to next children in tree chain
+    //Node element that carry comparison key, height, data and references to next children in tree chain
     private static class Node<T> {
         private T data;
         private Node<T> leftChild;
         private Node<T> rightChild;
+        private int key;
         private int height; //avl tree uses height in each node
 
-        public Node(T data) {
+        public Node(int key, T data) {
             this.data = data;
             this.leftChild = null;
             this.rightChild = null;
+            this.key = key;
         }
     }
 
@@ -126,13 +125,13 @@ public class AVLTree<T> {
         //if child is null last call in stack returns the newNode to be added to tree
         if (currentNode == null) return newNode;
 
-        if (comparator.compare(newNode.data, currentNode.data) < 0) {
+        if (newNode.key < currentNode.key) {
             currentNode.leftChild = recursiveAddition(currentNode.leftChild, newNode); //move to left child
-        } else if (comparator.compare(newNode.data, currentNode.data) > 0) {
+        } else if (newNode.key > currentNode.key) {
             currentNode.rightChild = recursiveAddition(currentNode.rightChild, newNode); //move to right child
         } else {
             //if key of new element equals key in of node in tree throw exception and it won't be added
-            throw new RuntimeException("There is already an item with Value: " + currentNode.data);
+            throw new RuntimeException("There is already an item with key: " + currentNode.key + ", has Value: " + currentNode.data);
         }
 
         updateNodeHeight(currentNode); //update each node height
@@ -140,8 +139,8 @@ public class AVLTree<T> {
     }
 
     //add new element
-    public void add (T element){
-        root = recursiveAddition(root, new Node<>(element));
+    public void add ( int key, T element){
+        root = recursiveAddition(root, new Node<>(key, element));
         size++;
     }
 
@@ -151,14 +150,14 @@ public class AVLTree<T> {
     }
 
     //remove element from tree recursively
-    private Node<T> recursiveRemoval(Node<T> currentNode, T target) {
+    private Node<T> recursiveRemoval(Node<T> currentNode, int key) {
 
         if (currentNode == null) return null; //reached null child of leaf stop
 
-        if (comparator.compare(target, currentNode.data) < 0) {
-            currentNode.leftChild = recursiveRemoval(currentNode.leftChild, target); //move to left child
-        } else if (comparator.compare(target, currentNode.data) > 0) {
-            currentNode.rightChild = recursiveRemoval(currentNode.rightChild, target); //move to right child
+        if (key < currentNode.key) {
+            currentNode.leftChild = recursiveRemoval(currentNode.leftChild, key); //move to left child
+        } else if (key > currentNode.key) {
+            currentNode.rightChild = recursiveRemoval(currentNode.rightChild, key); //move to right child
         } else {
 
             //found target node
@@ -175,9 +174,10 @@ public class AVLTree<T> {
             //Case 4 (node has 2 children): replace the node value with the value of smallest child in right subtree
             Node<T> smallestNode = getDeepestLeftNode(currentNode.rightChild);
             currentNode.data = smallestNode.data;
+            currentNode.key = smallestNode.key;
 
             //remove the smallest child node in right subtree
-            currentNode.rightChild = recursiveRemoval(currentNode.rightChild, smallestNode.data);
+            currentNode.rightChild = recursiveRemoval(currentNode.rightChild, smallestNode.key);
 
             //Note: Case 4 another approach is to replace node value with the value of biggest child in left subtree
         }
@@ -186,9 +186,9 @@ public class AVLTree<T> {
         return rebalance(currentNode); //rebalance node before returning
     }
 
-    //delete node
-    public void remove(T element){
-        root = recursiveRemoval(root, element);
+    //delete node by its key
+    public void remove(int key){
+        root = recursiveRemoval(root, key);
         size--;
     }
 
@@ -268,26 +268,26 @@ public class AVLTree<T> {
     }
 
     //Depth First Search (DFS)
-    private Node<T> search(Node<T> node, T target) {
+    private Node<T> search(Node<T> node, int targetKey) {
         if(node == null) return null; //reached null child of leaf stop
 
-        if (comparator.compare(target, node.data) < 0) return search(node.leftChild, target); //if target key is less than current move left
-        else if(comparator.compare(target, node.data) > 0) return search(node.rightChild, target); //else if target key is bigger than current move right
+        if (targetKey < node.key) return search(node.leftChild, targetKey); //if target key is less than current move left
+        else if(targetKey > node.key) return search(node.rightChild, targetKey); //else if target key is bigger than current move right
 
         //else return current node which has key that equals target key
         return node;
     }
 
-    //get data by element
-    public T find(T element){
-        Node<T> node = search(root, element);
+    //get data by key
+    public T get(int key){
+        Node<T> node = search(root, key);
         if(node==null) return null;
         return node.data;
     }
 
-    //check if tree contain element
-    public boolean contains(T element){
-        return find(element) != null;
+    //check if tree contain element with key
+    public boolean contains(int key){
+        return get(key) != null;
     }
 
     //clear all elements
