@@ -17,3 +17,7 @@
 - ### HashTable (Separate Chain)
 - ### Graph (Adjacency Matrix)
 - ### Graph (Adjacency List)
+---
+# See Also:
+ |![Artboard](https://github.com/user-attachments/assets/dd4073ed-d596-4257-b63a-4f54fc9e6191) | [Generic Algorithms Implementation in Java and C#](https://github.com/amrk000/Algorithms-Implementation-Java-CSharp)|
+ |-|-|
