@@ -30,7 +30,7 @@ class AVLTree<T>
         internal Node<T> rightChild;
         internal int height; //avl tree uses height in each node
 
-        public Node(int key, T data)
+        public Node(T data)
         {
             this.data = data;
             this.leftChild = null;
@@ -169,9 +169,9 @@ class AVLTree<T>
     }
 
     //add new element
-    public void Add(int key, T element)
+    public void Add(T element)
     {
-        root = RecursiveAddition(root, new Node<T>(key, element));
+        root = RecursiveAddition(root, new Node<T>(element));
         size++;
     }
 
@@ -227,7 +227,7 @@ class AVLTree<T>
     }
 
     //delete node
-    public void remove(T element)
+    public void Remove(T element)
     {
         root = RecursiveRemoval(root, element);
         size--;
@@ -348,7 +348,7 @@ class AVLTree<T>
     }
 
     //clear all elements
-    public void clear()
+    public void Clear()
     {
         size = 0;
         root = null;

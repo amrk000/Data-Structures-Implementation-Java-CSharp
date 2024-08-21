@@ -29,7 +29,7 @@ class BinaryTree<T>
         internal Node<T> leftChild;
         internal Node<T> rightChild;
 
-        public Node(int key, T data)
+        public Node(T data)
         {
             this.data = data;
             this.leftChild = null;
@@ -44,7 +44,7 @@ class BinaryTree<T>
     }
 
     //check if it's empty
-    public bool isEmpty()
+    public bool IsEmpty()
     {
         return size == 0;
     }
@@ -86,9 +86,9 @@ class BinaryTree<T>
     }
 
     //add new element
-    public void Add(int key, T element)
+    public void Add(T element)
     {
-        root = RecursiveAddition(root, new Node<T>(key, element));
+        root = RecursiveAddition(root, new Node<T>(element));
         size++;
     }
 
