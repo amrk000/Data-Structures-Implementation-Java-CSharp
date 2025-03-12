@@ -61,7 +61,7 @@ class MatrixGraph<T> : IEnumerable<T>
         int i = 0;
         while (i < size)
         {
-            if (Comparer.ReferenceEquals(vertexData[i], data)) break;
+            if (Comparer.Equals(vertexData[i], data)) break;
             i++;
         }
 
